@@ -1,0 +1,15 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
+    }
+}
+
+file('versions').eachDir { dir ->
+    def projectName = "versions-${dir.name}"
+    include(projectName)
+    project(":$projectName").projectDir = dir
+}
