@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerListEntry.class)
-public class CapeFeatureRendererMixin {
+public class PlayerListEntryMixin {
 
     @Inject(method = "getSkinTextures", at = @At("RETURN"), cancellable = true)
     private void modifySkinTextures(CallbackInfoReturnable<SkinTextures> cir) {

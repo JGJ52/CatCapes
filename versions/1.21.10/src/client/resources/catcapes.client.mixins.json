@@ -6,7 +6,7 @@
   "client": [
   ],
   "mixins": [
-    "CapeFeatureRendererMixin"
+    "PlayerListEntryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
