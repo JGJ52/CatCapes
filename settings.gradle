@@ -9,7 +9,7 @@ pluginManagement {
 }
 
 file('versions').eachDir { dir ->
-    def projectName = "versions-${dir.name}"
+    def projectName = "version-${dir.name}"
     include(projectName)
     project(":$projectName").projectDir = dir
 }

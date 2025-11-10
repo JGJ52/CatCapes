@@ -44,8 +44,8 @@ public class Utils {
         new Thread(() -> {
             try {
                 String capeName;
-                if (uuid.equals(MinecraftClient.getInstance().player.getGameProfile().id()) && !ConfigFile.get("cape", "").isEmpty()) {
-                    capeName = ConfigFile.get("cape", "");
+                if (uuid.equals(MinecraftClient.getInstance().player.getGameProfile().id()) && !CatCapesClient.CONFIG.cape().isEmpty()) {
+                    capeName = CatCapesClient.CONFIG.cape();
                     PLAYER_CACHE.put(uuid, capeName);
                 } else {
                     HttpURLConnection conn = (HttpURLConnection) new URL("https://catcapes.jgj52.hu/player/" + uuid).openConnection();
