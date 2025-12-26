@@ -45,19 +45,18 @@ public class Utils {
                 if (frames == null || frames.isEmpty()) return null;
 
                 int frameIndex = ANIMATED_TICKS.getOrDefault(name, 0);
-                int frameCount = frames.size();
 
-                Identifier id = frames.get(frameIndex);
+                frameIndex++;
+                if (frameIndex >= frames.size()) frameIndex = 0;
 
-                frameIndex += 1;
-                if (frameIndex >= frameCount) frameIndex = 0;
                 ANIMATED_TICKS.put(name, frameIndex);
 
-                return id;
+                return frames.get(frameIndex);
             } else {
                 return CAPE_CACHE.get(name);
             }
         }
+
 
         LOADING.add(uuid);
 
@@ -90,8 +89,6 @@ public class Utils {
                 Path capePath = FabricLoader.getInstance().getGameDir().resolve("catcapes/" + capeName);
                 Files.createDirectories(capePath.getParent());
 
-                boolean isGif = false;
-
                 if (!Files.exists(capePath)) {
                     URL url = new URL("https://catcapes.jgj52.hu/cape/" + capeName);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -102,7 +99,9 @@ public class Utils {
                     int resCode = connection.getResponseCode();
                     if (resCode == 200) {
                         String contentType = connection.getHeaderField("Content-Type");
-                        if (contentType.equals("image/gif")) isGif = true;
+                        List<String> now = CatCapesClient.CONFIG.animatedCapes();
+                        if (contentType.equals("image/gif")) now.add(capeName);
+                        CatCapesClient.CONFIG.animatedCapes(now);
 
                         try (InputStream in = connection.getInputStream()) {
                             Files.copy(in, capePath, StandardCopyOption.REPLACE_EXISTING);
@@ -114,7 +113,7 @@ public class Utils {
                     connection.disconnect();
                 }
 
-                if (isGif) {
+                if (CatCapesClient.CONFIG.animatedCapes().contains(capeName)) {
                     GifDecoder decoder = new GifDecoder();
                     decoder.read(Files.newInputStream(capePath));
 
@@ -134,13 +133,15 @@ public class Utils {
                         }
                         Identifier id = Identifier.of("catcapes", "capes/" + capeName + "/" + i);
                         int finalI = i;
-                        NativeImageBackedTexture texture = //? if <=1.21.4 {
-                                /*new NativeImageBackedTexture(image);
-                                 *///?} else {
-                                new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName + "/" + finalI, image);
-                        //?}
-                        MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
-                        texture.upload();
+                        MinecraftClient.getInstance().execute(() -> {
+                            NativeImageBackedTexture texture = //? if <=1.21.4 {
+                                    /*new NativeImageBackedTexture(image);
+                                     *///?} else {
+                                    new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName + "/" + finalI, image);
+                            //?}
+                            MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
+                            texture.upload();
+                        });
                         frames.add(id);
                     }
                     ANIMATED_CAPES.put(capeName, frames);
@@ -164,6 +165,7 @@ public class Utils {
             } catch (Exception e) {
                 NO_CAPE.add(uuid);
                 System.err.println("Failed to load cape for " + uuid + ": " + e.getMessage());
+                e.printStackTrace();
             } finally {
                 LOADING.remove(uuid);
             }

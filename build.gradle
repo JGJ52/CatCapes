@@ -1,6 +1,14 @@
 plugins {
     id 'fabric-loom' version '1.13-SNAPSHOT'
     id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.2.0'
+}
+
+configurations {
+    shade {
+        canBeConsumed = false
+        canBeResolved = true
+    }
 }
 
 version = project.mod_version
@@ -32,6 +40,7 @@ repositories {
 }
 
 dependencies {
+    shade "com.madgag:animated-gif-lib:1.4"
     implementation "com.madgag:animated-gif-lib:1.4"
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -83,9 +92,24 @@ java {
 }
 
 jar {
+    enabled = true
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
+}
+
+shadowJar {
+    archiveClassifier.set("shadow")
+    configurations = [project.configurations.shade]
+
+    from(sourceSets.client.resources)
+    from(sourceSets.client.output)
+}
+
+remapJar {
+    input = shadowJar.archiveFile
+    archiveClassifier.set("")
+    dependsOn(shadowJar)
 }
 
 // configure the maven publication
