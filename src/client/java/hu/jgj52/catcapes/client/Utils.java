@@ -24,6 +24,7 @@ public class Utils {
     private static final Map<String, Identifier> CAPE_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, List<Identifier>> ANIMATED_CAPES = new ConcurrentHashMap<>();
     private static final Map<String, Integer> ANIMATED_TICKS = new ConcurrentHashMap<>();
+    private static final Map<String, Long> ANIMATED_TICK_COUNTER = new ConcurrentHashMap<>();
     private static final Map<UUID, String> PLAYER_CACHE = new ConcurrentHashMap<>();
     private static final Set<UUID> LOADING = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> NO_CAPE = ConcurrentHashMap.newKeySet();
@@ -41,15 +42,20 @@ public class Utils {
 
         if (name != null) {
             if (Boolean.TRUE.equals(IS_ANIMATED.get(name))) {
+                Long nowTick = ANIMATED_TICK_COUNTER.getOrDefault(name, 0L);
                 List<Identifier> frames = ANIMATED_CAPES.get(name);
                 if (frames == null || frames.isEmpty()) return null;
 
                 int frameIndex = ANIMATED_TICKS.getOrDefault(name, 0);
 
-                frameIndex++;
-                if (frameIndex >= frames.size()) frameIndex = 0;
+                if (System.currentTimeMillis() - nowTick >= 1000 * CatCapesClient.CONFIG.update()) {
+                    frameIndex++;
+                    if (frameIndex >= frames.size()) frameIndex = 0;
+                    nowTick = System.currentTimeMillis();
+                }
 
                 ANIMATED_TICKS.put(name, frameIndex);
+                ANIMATED_TICK_COUNTER.put(name, nowTick);
 
                 return frames.get(frameIndex);
             } else {

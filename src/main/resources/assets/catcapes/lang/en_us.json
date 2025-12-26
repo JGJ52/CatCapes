@@ -1,5 +1,6 @@
 {
   "text.config.catcapes.title": "CatCapes Configuration Menu",
   "text.config.catcapes.option.cape": "Selected cape",
-  "text.config.catcapes.option.token": "Token"
+  "text.config.catcapes.option.token": "Token",
+  "text.config.catcapes.option.update": "Animated capes update interval (seconds)"
 }

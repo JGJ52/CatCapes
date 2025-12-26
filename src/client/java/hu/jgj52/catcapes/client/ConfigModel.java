@@ -14,4 +14,5 @@ public class ConfigModel {
     public String token = "";
     @ExcludeFromScreen
     public List<String> animatedCapes = new ArrayList<>();
+    public Double update = 0.5;
 }
