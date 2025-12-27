@@ -3,11 +3,11 @@ package hu.jgj52.catcapes.mixin.client;
 import hu.jgj52.catcapes.client.Utils;
 import net.minecraft.client.network.PlayerListEntry;
 //? if <=1.21.8 {
-/*import net.minecraft.client.util.SkinTextures;
-*///? } else {
-import net.minecraft.entity.player.SkinTextures;
+import net.minecraft.client.util.SkinTextures;
+//? } else {
+/*import net.minecraft.entity.player.SkinTextures;
 import net.minecraft.util.AssetInfo;
-//? }
+*///? }
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +27,7 @@ public class PlayerListEntryMixin {
 
         if (cape != null) {
             //? if <=1.21.8 {
-            /*cir.setReturnValue(new SkinTextures(
+            cir.setReturnValue(new SkinTextures(
                     original.texture(),
                     original.textureUrl(),
                     cape,
@@ -35,13 +35,13 @@ public class PlayerListEntryMixin {
                     original.model(),
                     original.secure()
             ));
-            *///? } else {
-            cir.setReturnValue(new SkinTextures(
+            //? } else {
+            /*cir.setReturnValue(new SkinTextures(
                     original.body(),
                     new AssetInfo.TextureAssetInfo(cape, cape), new AssetInfo.TextureAssetInfo(cape, cape),
                     original.model(), original.secure()
             ));
-            //? }
+            *///? }
         } else {
             cir.setReturnValue(original);
         }
