@@ -27,6 +27,66 @@ public class CatCapesClient implements ClientModInitializer {
                     return 1;
                 })
         ));
+        CONFIG.subscribeToOnline(online -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+
+            if (client.player == null) return;
+
+            new Thread(() -> {
+                boolean success = true;
+
+                if (online) {
+                    try {
+                        URL url = new URL("https://catcapes.jgj52.hu/v2/set");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setDoOutput(true);
+
+                        String json = String.format("{\"token\":\"%s\",\"cape\":\"%s\"}", CONFIG.token(), CONFIG.cape());
+
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(json.getBytes(StandardCharsets.UTF_8));
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        if (responseCode != 200) success = false;
+
+                        conn.disconnect();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        URL url = new URL("https://catcapes.jgj52.hu/set");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setDoOutput(true);
+
+                        String json = String.format("{\"uuid\":\"%s\",\"cape\":\"%s\"}", Utils.getOfflineUUID(client.player), CONFIG.cape());
+
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(json.getBytes(StandardCharsets.UTF_8));
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        if (responseCode != 200) success = false;
+
+                        conn.disconnect();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                boolean finalSuccess = success;
+                client.execute(() -> {
+                    if (finalSuccess) {
+                        Utils.removePlayerCache(Utils.getUUID(client.player));
+                    }
+                });
+            }).start();
+        });
         CONFIG.subscribeToCape(cape -> {
             MinecraftClient client = MinecraftClient.getInstance();
 
@@ -35,33 +95,54 @@ public class CatCapesClient implements ClientModInitializer {
             new Thread(() -> {
                 boolean success = true;
 
-                try {
-                    URL url = new URL("https://catcapes.jgj52.hu/v2/set");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setDoOutput(true);
+                if (CONFIG.online()) {
+                    try {
+                        URL url = new URL("https://catcapes.jgj52.hu/v2/set");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setDoOutput(true);
 
-                    String json = String.format("{\"token\":\"%s\",\"cape\":\"%s\"}", CONFIG.token(), cape);
+                        String json = String.format("{\"token\":\"%s\",\"cape\":\"%s\"}", CONFIG.token(), cape);
 
-                    try (OutputStream os = conn.getOutputStream()) {
-                        os.write(json.getBytes(StandardCharsets.UTF_8));
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(json.getBytes(StandardCharsets.UTF_8));
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        if (responseCode != 200) success = false;
+
+                        conn.disconnect();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                } else {
+                    try {
+                        URL url = new URL("https://catcapes.jgj52.hu/set");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setDoOutput(true);
 
-                    int responseCode = conn.getResponseCode();
-                    if (responseCode != 200) success = false;
+                        String json = String.format("{\"uuid\":\"%s\",\"cape\":\"%s\"}", Utils.getUUID(client.player), cape);
 
-                    conn.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(json.getBytes(StandardCharsets.UTF_8));
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        if (responseCode != 200) success = false;
+
+                        conn.disconnect();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 boolean finalSuccess = success;
                 client.execute(() -> {
-                    if (client.player != null) {
-                        if (finalSuccess) {
-                            Utils.removePlayerCache(Utils.getUUID(client.player));
-                        }
+                    if (finalSuccess) {
+                        Utils.removePlayerCache(Utils.getUUID(client.player));
                     }
                 });
             }).start();

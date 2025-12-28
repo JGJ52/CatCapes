@@ -50,7 +50,6 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     modImplementation "io.wispforest:owo-lib:${project.owolib_version}"
-    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
     annotationProcessor "io.wispforest:owo-lib:${project.owolib_version}"
 }
 

@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -29,7 +30,7 @@ public class Utils {
     private static final Set<UUID> LOADING = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> NO_CAPE = ConcurrentHashMap.newKeySet();
 
-    public static Identifier getCape(UUID uuid) {
+    public static Identifier getCape(UUID uuid, Boolean online) {
         if (NO_CAPE.contains(uuid)) {
             return null;
         }
@@ -69,7 +70,7 @@ public class Utils {
         new Thread(() -> {
             try {
                 String capeName;
-                HttpURLConnection conn = (HttpURLConnection) new URL("https://catcapes.jgj52.hu/player/" + uuid).openConnection();
+                HttpURLConnection conn = (HttpURLConnection) new URL("https://catcapes.jgj52.hu" + (online ? "/" : "/offline") + "/player/" + uuid).openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
@@ -142,10 +143,10 @@ public class Utils {
                         int finalI = i;
                         MinecraftClient.getInstance().execute(() -> {
                             NativeImageBackedTexture texture = //? if <=1.21.4 {
-                                    new NativeImageBackedTexture(image);
-                                     //?} else {
-                                    /*new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName + "/" + finalI, image);
-                            *///?}
+                                    /*new NativeImageBackedTexture(image);
+                                     *///?} else {
+                                    new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName + "/" + finalI, image);
+                            //?}
                             MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
                             texture.upload();
                         });
@@ -159,10 +160,10 @@ public class Utils {
 
                     MinecraftClient.getInstance().execute(() -> {
                         NativeImageBackedTexture texture = //? if <=1.21.4 {
-                                new NativeImageBackedTexture(img);
-                                 //?} else {
-                                /*new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName, img);
-                        *///?}
+                                /*new NativeImageBackedTexture(img);
+                                 *///?} else {
+                                new NativeImageBackedTexture(() -> "catcapes:capes/" + capeName, img);
+                        //?}
                         MinecraftClient.getInstance().getTextureManager().registerTexture(textureId, texture);
                         texture.upload();
                         CAPE_CACHE.put(capeName, textureId);
@@ -196,10 +197,15 @@ public class Utils {
     public static UUID getUUID(PlayerListEntry player) {
         return player.getProfile()
         //? if <=1.21.8 {
-            .getId()
-        //? } else {
-            /*.id()
-        *///? }
+            /*.getId()
+        *///? } else {
+            .id()
+        //? }
         ;
+    }
+    public static UUID getOfflineUUID(PlayerEntity player) {
+        return UUID.nameUUIDFromBytes(
+                ("OfflinePlayer:" + player.getName().getString()).getBytes(StandardCharsets.UTF_8)
+        );
     }
 }

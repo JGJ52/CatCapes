@@ -2,5 +2,6 @@
   "text.config.catcapes.title": "CatCapes Konfigurációs Menü",
   "text.config.catcapes.option.cape": "Kiválasztott köpeny",
   "text.config.catcapes.option.token": "Token",
-  "text.config.catcapes.option.update": "Animált köpenyek frissítési intervalluma (másodpercben)"
+  "text.config.catcapes.option.update": "Animált köpenyek frissítési intervalluma (másodpercben)",
+  "text.config.catcapes.option.online": "Online mód"
 }
