@@ -14,11 +14,10 @@ import java.nio.charset.StandardCharsets;
 public class CatCapesClient implements ClientModInitializer {
 
     public static final hu.jgj52.catcapes.client.Config CONFIG = hu.jgj52.catcapes.client.Config.createAndLoad();
-    private static ModWebSocket wsc;
 
     @Override
     public void onInitializeClient() {
-        wsc = new ModWebSocket();
+        ModWebSocket wsc = new ModWebSocket();
         wsc.connect("wss://catcapes.jgj52.hu");
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("reloadcapes")
                 .executes(context -> {

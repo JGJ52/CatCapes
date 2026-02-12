@@ -32,6 +32,6 @@
     "fabric": "*",
     "minecraft": "${supported_minecraft_version}",
     "modmenu": "*",
-    "owo-lib": "*"
+    "owo": "*"
   }
 }

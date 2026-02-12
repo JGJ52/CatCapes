@@ -11,10 +11,14 @@ public class ModWebSocket implements WebSocket.Listener {
     private WebSocket webSocket;
 
     public void connect(String url) {
-        HttpClient client = HttpClient.newHttpClient();
-        webSocket = client.newWebSocketBuilder()
-                .buildAsync(URI.create(url), this)
-                .join();
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            webSocket = client.newWebSocketBuilder()
+                    .buildAsync(URI.create(url), this)
+                    .join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void send(String message) {
